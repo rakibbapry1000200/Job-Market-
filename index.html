@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JobBD - প্রফেশনাল জব পোর্টাল</title>
+
+    <style>
+/* ফন্ট ইম্পোর্ট */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Sans+Bengali:wght@400;700&display=swap');
+
+/* শুধুমাত্র লাইট মোড ভ্যারিয়েবল (স্থায়ী) */
+:root {
+    --primary-color: #1E88E5; 
+    --secondary-color: #43A047; 
+    --accent-color: #FFB300; 
+    --background-color: #F3F6FB; 
+    --card-bg: #FFFFFF;
+    --text-color: #212121;
+    --muted-text: #616161;
+    --card-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    --font-family: 'Noto Sans Bengali', 'Roboto', sans-serif;
+    --svg-color: #1E88E5;
+    --marquee-bg: #FFC107; 
+    --marquee-text: #212121; 
+    --marquee-shadow: 0 4px 10px rgba(255, 193, 7, 0.5); 
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+    touch-action: pan-y;
+}
+
+/* --- হেডার স্টাইল (স্ক্রল এফেক্ট) --- */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    z-index: 1000;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: transform 0.3s ease-in-out; 
+}
+.header.hidden {
+    transform: translateY(-100%);
+}
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; 
+    padding: 5px 15px;
+    height: 55px;
+    box-sizing: border-box;
+}
+.logo-group {
+    display: flex;
+    align-items: center;
+}
+.logo-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.app-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-left: 12px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* মারকিউ স্টাইল */
+.marquee-container {
+    margin-top: 55px; 
+    padding: 10px 15px;
+    background-color: var(--marquee-bg); 
+    overflow: hidden;
+    white-space: nowrap;
+    box-shadow: var(--marquee-shadow); 
+    font-weight: 700; 
+}
+.marquee-content {
+    display: inline-block;
+    padding-left: 100%;
+    animation: slowScroll 60s linear infinite;
+    font-size: 16px;
+    color: var(--marquee-text); 
+}
+@keyframes slowScroll { to { transform: translateX(-100%); } }
+
+/* --- স্লাইডার কনটেইনার --- */
+.slider-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    position: relative;
+    border-radius: 12px;
+    touch-action: pan-y; 
+}
+.slider-wrapper {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.slide {
+    min-width: 100%;
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer;
+    padding: 0; 
+    overflow: hidden; 
+}
+
+/* --- পোস্ট হেডার --- */
+.post-section-header {
+    padding: 15px 15px 5px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: center;
+    background-color: var(--background-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* পোস্ট সেকশন */
+.post-grid {
+    padding: 15px 15px 70px; 
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+.post-card {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+.post-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+.post-thumbnail {
+    width: 100%;
+    aspect-ratio: 640 / 319;
+    background-color: var(--background-color);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--muted-text);
+}
+.post-title {
+    padding: 12px 15px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+/* --- ফুটার (চিকন) --- */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--card-bg);
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0; 
+    height: 55px; 
+    box-sizing: border-box;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    z-index: 100; 
+}
+.footer-item {
+    text-align: center;
+    text-decoration: none;
+    color: var(--muted-text);
+    font-size: 12px; 
+    cursor: pointer;
+    padding: 0 5px; 
+    flex-grow: 1;
+    transition: all 0.3s;
+}
+.footer-item.active {
+    color: var(--primary-color);
+    font-weight: 700;
+    border-top: 3px solid var(--primary-color);
+}
+.footer-item svg {
+    width: 24px; 
+    height: 24px;
+    display: block;
+    margin: 0 auto 2px; 
+    fill: currentColor;
+    transition: fill 0.3s, transform 0.3s;
+}
+.footer-item:hover svg {
+    transform: scale(1.15);
+}
+
+/* --- ডিটেইল পেজ (Full Page Overlay) --- */
+.detail-page {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background-color: var(--card-bg); 
+    z-index: 1001;
+    transform: translateX(100%); 
+    transition: transform 0.4s ease-out;
+    overflow-y: auto; 
+    padding-bottom: 50px;
+}
+.detail-page.visible { 
+    transform: translateX(0); 
+} 
+.detail-header {
+    position: sticky; 
+    top: 0; 
+    background-color: var(--card-bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    padding: 12px 15px;
+    display: flex; 
+    align-items: center;
+    z-index: 1002;
+}
+.detail-back-btn { font-size: 26px; margin-right: 15px; cursor: pointer; color: var(--primary-color); }
+.detail-content { padding: 20px 15px; }
+
+/* ⭐ নতুন Apply Link Header স্টাইল ⭐ */
+.apply-link-header {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 15px 10px 5px; 
+    padding-left: 5px; 
+    border-bottom: 2px solid var(--primary-color);
+    display: inline-block; /* শুধু টেক্সট অনুযায়ী বর্ডার দেবে */
+}
+
+/* নতুন Apply Link স্টাইল */
+.apply-link-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--background-color);
+    border: 2px solid var(--secondary-color); /* রঙের পরিবর্তন */
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin: 0 10px 20px; /* মার্জিন ঠিক করা হয়েছে */
+}
+.apply-link {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+.copy-button {
+    margin-left: 15px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+.copy-button svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--secondary-color);
+    transition: transform 0.2s;
+}
+.copy-button:active svg {
+    transform: scale(0.9);
+}
+
+/* কপি করার বার্তা */
+.copy-message {
+    text-align: center;
+    color: var(--secondary-color);
+    font-weight: 700;
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.copy-message.visible {
+    opacity: 1;
+}
+
+/* --- ডিটেইল পেজ ডেসক্রিপশন স্টাইল --- */
+.detail-description-formatted {
+    line-height: 1.8;
+    color: var(--text-color);
+    font-size: 16px;
+    padding: 10px;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    white-space: pre-wrap; 
+    border-left: 5px solid var(--secondary-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.detail-description-formatted strong {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+    </style>
+</head>
+<body>
+
+    <header class="header" id="appHeader">
+        <div class="header-content">
+            <div class="logo-group">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyr2GakHdN3DT7wHGsdrgdMLAJG_KechIVPLdoXmkP4JS3MgrM36V9ljK5&s=10" alt="JobBD Logo" class="logo-img">
+                <span class="app-title">Job Market </span>
+            </div>
+        </div>
+    </header>
+
+    <main id="mainContent" style="padding-top: 0; padding-bottom: 0;">
+        <div class="marquee-container">
+            <div class="marquee-content" id="marqueeText">
+                জরুরী নিয়োগ বিজ্ঞপ্তি! নতুন পোস্ট দেখতে এখনই চেক করুন।
+            </div>
+        </div>
+
+        <div class="slider-container">
+            <div class="slider-wrapper" id="sliderWrapper">
+                <div class="slide" style="background-color: var(--primary-color);">স্লাইড ১ (লোড হচ্ছে...)</div>
+            </div>
+        </div>
+        
+        <div class="post-section-header">
+            📰 সকল নিয়োগ বিজ্ঞপ্তি
+        </div>
+
+        <div class="post-grid" id="postGrid">
+            </div>
+    </main>
+
+    <div class="detail-page" id="postDetailPage">
+        <div class="detail-header">
+            <span class="detail-back-btn" id="detailBackBtn">￩</span>
+            <div class="app-title" style="font-size: 20px;">Job Details </div>
+        </div>
+        <div class="detail-content">
+            <div class="post-thumbnail" id="detailThumbnail" style="aspect-ratio: 2 / 1; margin-bottom: 15px;">🖼️ মূল থাম্বনেইল (বড়)</div>
+            <h1 class="post-title" id="detailTitle" style="font-size: 22px;">পোস্ট ডিটেইল টাইটেল</h1>
+            
+            <p id="detailDescription" class="detail-description-formatted"></p>
+            
+            <h3 class="apply-link-header">আবেদন লিংক</h3>
+            
+            <div class="apply-link-container">
+                <a href="#" id="mainApplyLink" class="apply-link" target="_blank">আবেদনের লিঙ্ক</a>
+                <button id="copyLinkButton" class="copy-button">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                </button>
+            </div>
+            <p id="copyMessage" class="copy-message">কপি করা হয়েছে! লিঙ্কটি ব্রাউজারে খুলুন।</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-item" data-filter="govt" id="govtJobFilter">
+            <svg viewBox="0 0 24 24"><path d="M10 16h4v-4h2v-2h-2V8h-4v2h-2v2h2v4zM20 6h-3V4c0-1.1-.9-2-2-2H9c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM9 4h6v2H9V4z"/></svg>
+            সরকারি চাকরি
+        </div>
+        <div class="footer-item" data-filter="private" id="privateJobFilter">
+            <svg viewBox="0 0 24 24"><path d="M19 19V5h-6V3h-2v2H5v14h14zM11 15H9v-2h2v2zm0-4H9V9h2v2zm4 4h-2v-2h2v2zm0-4h-2V9h2v2zm4-4h-2V9h2v2z"/></svg>
+            বেসরকারি চাকরি
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
+
+    <script>
+        // ======================================================
+        // Firebase কনফিগারেশন এবং লজিক 
+        // ======================================================
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjthFBjHtL__1y5TmLoGeKtC3oPxkdH4c",
+            authDomain: "job-bd-c3008.firebaseapp.com",
+            databaseURL: "https://job-bd-c3008-default-rtdb.firebaseio.com",
+            projectId: "job-bd-c3008",
+            storageBucket: "job-bd-c3008.firebasestorage.app",
+            messagingSenderId: "47317598723",
+            appId: "1:47317598723:web:bcc038509bcd391b314436",
+            measurementId: "G-PYPC5MS348"
+        };
+
+        const appHeader = document.getElementById('appHeader');
+        const marqueeText = document.getElementById('marqueeText');
+        const sliderWrapper = document.getElementById('sliderWrapper');
+        const postGrid = document.getElementById('postGrid');
+        const footerItems = document.querySelectorAll('.footer-item');
+        const govtJobFilter = document.getElementById('govtJobFilter');
+        const postDetailPage = document.getElementById('postDetailPage');
+        const detailBackBtn = document.getElementById('detailBackBtn');
+        const mainApplyLink = document.getElementById('mainApplyLink'); 
+        const copyLinkButton = document.getElementById('copyLinkButton'); 
+        const copyMessage = document.getElementById('copyMessage');
+        const detailThumbnail = document.getElementById('detailThumbnail');
+        const detailDescription = document.getElementById('detailDescription'); 
+        const mainContent = document.getElementById('mainContent'); 
+
+        let sliderIndex = 0;
+        let sliderInterval;
+        let database; 
+        let currentScrollY = 0; 
+        
+        // ⭐ নতুন কপি ফাংশন ⭐
+        function copyLink(event) {
+            event.preventDefault(); // লিঙ্ক ওপেন হওয়া বন্ধ
+            const linkToCopy = mainApplyLink.href;
+
+            if (navigator.clipboard && linkToCopy) {
+                navigator.clipboard.writeText(linkToCopy).then(() => {
+                    copyMessage.classList.add('visible');
+                    setTimeout(() => {
+                        copyMessage.classList.remove('visible');
+                    }, 2000);
+                }).catch(err => {
+                    // ফলব্যাক (পুরাতন ব্রাউজার বা কিছু WebView-এর জন্য)
+                    fallbackCopyTextToClipboard(linkToCopy);
+                });
+            } else {
+                 fallbackCopyTextToClipboard(linkToCopy);
+            }
+        }
+        
+        // ফলব্যাক কপি ফাংশন (যদি navigator.clipboard কাজ না করে)
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; 
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    copyMessage.classList.add('visible');
+                    setTimeout(() => { copyMessage.classList.remove('visible'); }, 2000);
+                } else {
+                    alert("দুঃখিত, কপি করা যায়নি। অনুগ্রহ করে ম্যানুয়ালি কপি করুন: " + text);
+                }
+            } catch (err) {
+                alert("দুঃখিত, কপি করা যায়নি। অনুগ্রহ করে ম্যানুয়ালি কপি করুন: " + text);
+            }
+
+            document.body.removeChild(textArea);
+        }
+        
+        // ইভেন্ট লিসেনার যোগ করা
+        copyLinkButton.addEventListener('click', copyLink);
+
+        function initializeFirebase() {
+            if (typeof firebase !== 'undefined') {
+                const app = firebase.initializeApp(firebaseConfig);
+                database = app.database();
+                loadDataFromFirebase();
+            } else {
+                setTimeout(initializeFirebase, 200); 
+            }
+        }
+        
+        function loadDataFromFirebase() {
+            if (!database) return; 
+            
+            database.ref('settings/marquee').on('value', (snapshot) => {
+                marqueeText.textContent = snapshot.val() || "কোনো নতুন বিজ্ঞপ্তি নেই।";
+            });
+
+            database.ref('sliders').on('value', (snapshot) => {
+                const slides = snapshot.val();
+                sliderWrapper.innerHTML = ''; 
+                if (slides) {
+                    Object.keys(slides).forEach(key => {
+                        const slide = slides[key];
+                        const slideEl = document.createElement('div');
+                        slideEl.classList.add('slide');
+                        slideEl.style.backgroundImage = `url(${slide.imageUrl})`; 
+                        slideEl.setAttribute('data-link', slide.isClickable ? slide.link : '');
+                        slideEl.addEventListener('click', () => {
+                             if (slide.link) window.open(slide.link, '_system');
+                        });
+                        sliderWrapper.appendChild(slideEl);
+                    });
+                    startSlider(); 
+                } else {
+                     sliderWrapper.innerHTML = '<div class="slide" style="background-color: var(--primary-color);">কোনো স্লাইড নেই।</div>';
+                }
+            });
+
+            database.ref('posts').on('value', (snapshot) => {
+                const posts = snapshot.val();
+                window.allPosts = posts;
+                
+                displayPosts(posts, 'govt'); 
+                govtJobFilter.classList.add('active'); 
+                
+                handleInitialURL(); 
+            });
+        }
+        
+        function startSlider() {
+            const slides = sliderWrapper.querySelectorAll('.slide');
+            if (slides.length < 2) {
+                clearInterval(sliderInterval);
+                sliderWrapper.style.transition = 'none';
+                sliderWrapper.style.transform = 'translateX(0)';
+                return;
+            }
+
+            clearInterval(sliderInterval);
+            
+            sliderInterval = setInterval(() => {
+                sliderIndex = (sliderIndex + 1) % slides.length;
+                sliderWrapper.style.transform = `translateX(${-sliderIndex * 100}%)`;
+            }, 5000); 
+
+            let startX, currentX;
+            let isDragging = false;
+            
+            sliderWrapper.addEventListener('touchstart', (e) => {
+                if (slides.length < 2) return;
+                isDragging = true;
+                startX = e.touches[0].clientX;
+                sliderWrapper.style.transition = 'none';
+                clearInterval(sliderInterval);
+            }, { passive: true });
+
+            sliderWrapper.addEventListener('touchmove', (e) => {
+                if (!isDragging || slides.length < 2) return;
+                currentX = e.touches[0].clientX;
+                const diff = currentX - startX;
+                
+                const slideWidth = slides[0].clientWidth;
+                const newTransform = (-sliderIndex * slideWidth) + diff;
+                sliderWrapper.style.transform = `translateX(${newTransform}px)`;
+
+            }, { passive: true });
+            
+            sliderWrapper.addEventListener('touchend', () => {
+                if (!isDragging || slides.length < 2) return;
+                isDragging = false;
+                
+                sliderWrapper.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                const diff = currentX - startX;
+                
+                if (diff < -50 && sliderIndex < slides.length - 1) {
+                    sliderIndex++;
+                } else if (diff > 50 && sliderIndex > 0) {
+                    sliderIndex--;
+                }
+                
+                sliderWrapper.style.transform = `translateX(${-sliderIndex * 100}%)`;
+                startSlider();
+            });
+        }
+        
+        function displayPosts(posts, filter) {
+            postGrid.innerHTML = '';
+            if (!posts) return;
+
+            const sortedPosts = Object.keys(posts).map(key => ({ id: key, ...posts[key] }))
+                                .sort((a, b) => b.timestamp - a.timestamp);
+
+            sortedPosts.forEach(post => {
+                if (post.type === filter) { 
+                    const card = document.createElement('div');
+                    card.classList.add('post-card');
+                    card.setAttribute('data-post-id', post.id);
+                    card.innerHTML = `
+                        <div class="post-thumbnail" style="background-image: url(${post.thumbnailUrl || ''});">
+                            ${post.thumbnailUrl ? '' : '🖼️ থাম্বনেইল'}
+                        </div>
+                        <div class="post-title">${post.title}</div>
+                    `;
+                    postGrid.appendChild(card);
+                }
+            });
+        }
+
+        footerItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const filter = item.getAttribute('data-filter');
+                footerItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                displayPosts(window.allPosts, filter);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        function formatDescription(description) {
+            if (!description) return '';
+
+            const lines = description.split('\n').filter(line => line.trim() !== '');
+            let htmlContent = '';
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (line.includes('🛑')) {
+                    htmlContent += `<div style="text-align: center; font-size: 18px; margin-bottom: 10px; color: var(--secondary-color); font-weight: 700;">${line}</div>`;
+                } else if (line.includes('★')) {
+                    let parts = line.split(':');
+                    if (parts.length >= 2) {
+                        const label = parts[0].trim().replace('★', '★ <strong>');
+                        const value = parts.slice(1).join(':').trim();
+                        htmlContent += `<div>${label}</strong>: ${value}</div>`;
+                    } else {
+                        htmlContent += `<div>${line}</div>`;
+                    }
+                } else {
+                    htmlContent += `<div>${line}</div>`;
+                }
+            });
+
+            return htmlContent;
+        }
+
+        postGrid.addEventListener('click', (e) => {
+            const card = e.target.closest('.post-card');
+            if (card) {
+                const postId = card.getAttribute('data-post-id');
+                showPostDetails(postId);
+            }
+        });
+
+        function showPostDetails(postId) {
+            const post = window.allPosts ? window.allPosts[postId] : null;
+            if (!post) {
+                return;
+            }
+
+            document.getElementById('detailTitle').textContent = post.title;
+            detailDescription.innerHTML = formatDescription(post.description);
+            detailThumbnail.style.backgroundImage = `url(${post.thumbnailUrl || ''})`;
+            detailThumbnail.textContent = post.thumbnailUrl ? '' : '🖼️ মূল থাম্বনেইল (বড়)';
+            
+            const mainLink = post.mainLink || '#';
+            
+            // ⭐ এখানে Apply Link সেট করা হয়েছে
+            mainApplyLink.href = mainLink;
+            mainApplyLink.textContent = mainLink.length > 50 ? mainLink.substring(0, 47) + '...' : mainLink;
+            
+            // যদি লিঙ্ক না থাকে, তাহলে কপি বাটন লুকিয়ে ফেলা
+            copyLinkButton.style.display = (mainLink === '#') ? 'none' : 'block';
+
+            currentScrollY = window.scrollY;
+
+            postDetailPage.classList.add('visible');
+            postDetailPage.scrollTop = 0; 
+
+            window.history.pushState({ page: 'detail', postId: postId, scrollY: currentScrollY }, post.title, `#post/${postId}`);
+
+        }
+
+        detailBackBtn.addEventListener('click', () => {
+            window.history.back(); 
+        });
+
+        window.addEventListener('popstate', (event) => {
+            if (!event.state || event.state.page !== 'detail') {
+                postDetailPage.classList.remove('visible');
+                if (event.state && event.state.scrollY !== undefined) {
+                    window.scrollTo(0, event.state.scrollY);
+                } else {
+                    window.scrollTo(0, currentScrollY);
+                }
+            } else if (event.state.page === 'detail' && event.state.postId) {
+                showPostDetails(event.state.postId); 
+            }
+        });
+
+        function handleInitialURL() {
+            const match = window.location.hash.match(/#post\/([^/]+)/);
+            if (match && window.allPosts) {
+                const postId = match[1];
+                if (window.allPosts[postId]) {
+                    showPostDetails(postId);
+                } else {
+                    window.history.replaceState(null, 'Job Market', '/');
+                }
+            }
+        }
+        
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.scrollY; 
+
+            if (postDetailPage.classList.contains('visible')) return; 
+
+            if (scrollTop > lastScrollTop && scrollTop > 55) { 
+                appHeader.classList.add('hidden');
+            } else if (scrollTop < lastScrollTop) {
+                appHeader.classList.remove('hidden');
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+        });
+
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+    </script>
+</body>
+</html>
